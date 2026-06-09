@@ -1,0 +1,55 @@
+{
+  "name": "@sysnormal/react-drawer-layout",
+  "package": "@sysnormal/react-drawer-layout",
+  "version": "1.0.0",
+  "author": "aalencarvz@gmail.com",
+  "license": "ISC",
+  "type": "module",
+  "description": "a common sysnormal react drawer library and drawer utils",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "cross-env NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest --verbose",
+    "build": "tsc"
+  },
+  "keywords": [
+    "sysnormal",
+    "javascript",
+    "js",
+    "react",
+    "drawer",
+    "layout"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@mui/icons-material": "^9.0.1",
+    "@types/lodash": "^4.17.24",
+    "@types/react": "^19.2.16",
+    "@types/react-dom": "^19.2.3",
+    "react": "*",
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.0.1",
+    "@mui/material": "^9.0.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "dependencies": {
+    "lodash": "^4.18.1"
+  }
+}
