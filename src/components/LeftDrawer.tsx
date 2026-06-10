@@ -12,11 +12,12 @@ import {
   alpha,
   styled,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Box
 } from "@mui/material";
 import _ from "lodash";
-import React, { ReactNode, forwardRef, useState } from "react";
-import { DrawerItem } from './DrawerItem.js';
+import React, { ReactNode, forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { DrawerItem, DrawerItemTypography } from './DrawerItem.js';
 import { DrawerItemList } from "./DrawerItemList.js";
 
 
@@ -126,25 +127,135 @@ export interface LeftDrawerProps extends Omit<MuiDrawerProps, 'open'> {
   setCollapsed?: (value: boolean) => void;
   currentPath?: string;
   onNavigate?: (path: string) => void;
+  typography?: DrawerItemTypography;
+  resizable?: boolean;
+  onWidthChange?: (width: number) => void;
+
 }
+
+const MIN_WIDTH = 200;
+const MAX_WIDTH = 600;
 
 
 const LeftDrawer = forwardRef<HTMLDivElement, LeftDrawerProps>(
   ({
     collapsed = false,
-    width = 240,
+    width: initialWidth = 240,
     items = [],
     translater,
     searchText = 'search',
     setCollapsed,
     currentPath,
     onNavigate,
+    typography,
+    resizable = true,
+    onWidthChange,
     ...drawerProps
   }, ref) => {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
     const [searchQuery, setSearchQuery] = useState('');
+    const [width, setWidth] = useState<number>(
+      typeof initialWidth === 'number' ? initialWidth : 240
+    );
+    const contentRef = useRef<HTMLDivElement>(null);
+    const isDragging = useRef(false);
 
+     // auto-ajuste via ResizeObserver
+    useEffect(() => {
+      if (!contentRef.current || collapsed) return;
+
+      let rafId: number;
+      let debounceId: ReturnType<typeof setTimeout>;
+
+      const measure = () => {
+        if (!contentRef.current) return;
+
+        const clone = contentRef.current.cloneNode(true) as HTMLElement;
+        clone.style.cssText = `
+          position: fixed;
+          visibility: hidden;
+          width: max-content;
+          max-width: ${MAX_WIDTH}px;
+          pointer-events: none;
+          top: -9999px;
+          left: -9999px;
+        `;
+
+        clone.querySelectorAll('.MuiCollapse-root').forEach(el => {
+          (el as HTMLElement).style.height = 'auto';
+          (el as HTMLElement).style.overflow = 'visible';
+        });
+        clone.querySelectorAll('.MuiCollapse-hidden').forEach(el => {
+          el.classList.remove('MuiCollapse-hidden');
+        });
+
+        document.body.appendChild(clone);
+        const naturalWidth = clone.offsetWidth;
+        document.body.removeChild(clone);
+
+        const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, naturalWidth + 32));
+        setWidth(newWidth);
+        onWidthChange?.(newWidth);
+      };
+
+      const debouncedMeasure = () => {
+        clearTimeout(debounceId);
+        // aguarda a animação do Collapse terminar antes de medir
+        debounceId = setTimeout(() => {
+          rafId = requestAnimationFrame(measure);
+        }, 300); // 300ms = duração padrão da animação do MUI Collapse
+      };
+
+      // mede na montagem sem debounce
+      rafId = requestAnimationFrame(measure);
+
+      const mutationObserver = new MutationObserver((mutations) => {
+        const relevant = mutations.some(m =>
+          m.type === 'attributes' &&
+          m.attributeName === 'class' &&
+          (m.target as HTMLElement).classList.contains('MuiCollapse-root')
+        );
+        if (relevant) debouncedMeasure();
+      });
+
+      mutationObserver.observe(contentRef.current, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class'],
+      });
+
+      return () => {
+        cancelAnimationFrame(rafId);
+        clearTimeout(debounceId);
+        mutationObserver.disconnect();
+      };
+
+    }, [collapsed, items]);
+
+     // drag para redimensionar
+    const handleDragStart = useCallback((e: React.MouseEvent) => {
+      e.preventDefault();
+      isDragging.current = true;
+      const startX = e.clientX;
+      const startWidth = width;
+
+      const onMouseMove = (e: MouseEvent) => {
+        if (!isDragging.current) return;
+        const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, startWidth + e.clientX - startX));
+        setWidth(newWidth);
+        onWidthChange?.(newWidth);  // ← notifica o RootLayout
+      };
+
+      const onMouseUp = () => {
+        isDragging.current = false;
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    }, [width]);
 
     const text = _.capitalize(
       translater ? translater(searchText) : searchText
@@ -170,14 +281,46 @@ const LeftDrawer = forwardRef<HTMLDivElement, LeftDrawerProps>(
     );
 
 
-    const contentList = (
-      <DrawerItemList
-        items={items}
-        collapsed={collapsed}
-        currentPath={currentPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/')}
-        onNavigate={onNavigate ?? (path => { window.location.href = path; })}
-        searchQuery={searchQuery}
+     const contentList = (
+      <Box ref={contentRef} sx={{ overflowX: 'hidden' }}>
+        <DrawerItemList
+          items={items}
+          collapsed={collapsed}
+          currentPath={currentPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/')}
+          onNavigate={onNavigate ?? (path => { window.location.href = path; })}
+          searchQuery={searchQuery}
+          typography={typography}
+        />
+      </Box>
+    );
+
+    // alça de resize na borda direita
+    const resizeHandle = resizable && !collapsed && !isSmallScreen ? (
+      <Box
+        onMouseDown={handleDragStart}
+        sx={{
+          position: 'absolute',
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: 4,
+          cursor: 'col-resize',
+          zIndex: 1,
+          '&:hover': {
+            backgroundColor: theme.palette.primary.main,
+            opacity: 0.3,
+          },
+        }}
       />
+    ) : null;
+
+    const drawerContent = (
+      <>
+        {contentHeader}
+        <Divider />
+        {contentList}
+        {resizeHandle}
+      </>
     );
 
     return isSmallScreen ? (
@@ -187,9 +330,7 @@ const LeftDrawer = forwardRef<HTMLDivElement, LeftDrawerProps>(
         open={!collapsed}
         {...drawerProps}
       >
-        {contentHeader}
-        <Divider />
-        {contentList}
+        {drawerContent}
       </MuiDrawer>
     ) : (
       <StyledDrawer
@@ -199,11 +340,9 @@ const LeftDrawer = forwardRef<HTMLDivElement, LeftDrawerProps>(
         width={width}
         {...drawerProps}
       >
-        {contentHeader}
-        <Divider />
-        {contentList}
+        {drawerContent}
       </StyledDrawer>
-    );
+    );  
   }
 );
 

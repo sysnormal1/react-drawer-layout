@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import { DrawerItem } from './DrawerItem.js';
+import { DrawerItem, DrawerItemTypography } from './DrawerItem.js';
 
 interface DrawerItemListProps {
   items: DrawerItem[];
@@ -18,6 +18,7 @@ interface DrawerItemListProps {
   currentPath?: string;
   onNavigate?: (path: string) => void;
   searchQuery?: string;
+  typography?: DrawerItemTypography;
 }
 
 function matchesSearch(item: DrawerItem, query: string): boolean {
@@ -35,6 +36,7 @@ function DrawerItemRow({
   onNavigate,
   searchQuery,
   depth = 0,
+  typography,
 }: {
   item: DrawerItem;
   collapsed?: boolean;
@@ -42,6 +44,7 @@ function DrawerItemRow({
   onNavigate?: (path: string) => void;
   searchQuery?: string;
   depth?: number;
+  typography?: DrawerItemTypography;
 }) {
   const [open, setOpen] = useState(false);
   const hasChildren = !!item.children?.length;
@@ -64,13 +67,30 @@ function DrawerItemRow({
       sx={{ pl: 2 + depth * 2 }}
     >
       {item.icon && (
-        <ListItemIcon sx={{ minWidth: collapsed && depth === 0 ? 'unset' : 36 }}>
+        <ListItemIcon
+          sx={{
+            minWidth: collapsed && depth === 0 ? 'unset' : 40, // ← era 36, aumentar para 40
+            mr: collapsed ? 0 : 1, // ← gap entre ícone e texto
+          }}
+        >
           {item.icon}
         </ListItemIcon>
       )}
       {!collapsed && (
         <>
-          <ListItemText primary={item.label} />
+          <ListItemText
+            primary={item.label}
+            slotProps={{
+              primary: {
+                sx: {
+                  fontSize: typography?.fontSize ?? '0.825rem',
+                  fontFamily: typography?.fontFamily,
+                  fontWeight: typography?.fontWeight ?? 500,
+                  letterSpacing: typography?.letterSpacing ?? '0.02em',
+                }
+              }
+            }}
+          />
           {hasChildren && (open ? <ExpandLess /> : <ExpandMore />)}
         </>
       )}
@@ -116,6 +136,7 @@ export function DrawerItemList({
   currentPath,
   onNavigate,
   searchQuery,
+  typography
 }: DrawerItemListProps) {
   const filtered = items.filter(item => matchesSearch(item, searchQuery ?? ''));
 
@@ -129,6 +150,7 @@ export function DrawerItemList({
           currentPath={currentPath}
           onNavigate={onNavigate}
           searchQuery={searchQuery}
+          typography={typography}
         />
       ))}
     </List>

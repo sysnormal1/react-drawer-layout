@@ -1,11 +1,11 @@
-// src/components/RootLayout.tsx - orquestra tudo
+// src/components/RootLayout.tsx
 import { Box, CssBaseline, ThemeProvider } from '@mui/material';
 import { ReactNode } from 'react';
 import { Theme } from '@mui/material';
 import { RootLayoutProvider, useRootLayoutContext } from './RootLayoutContext.js';
 import TopAppBar, { TopAppBarProps } from './TopAppBar.js';
 import LeftDrawer from './LeftDrawer.js';
-import { DrawerItem } from './DrawerItem.js';
+import { DrawerItem, DrawerItemTypography } from './DrawerItem.js';
 
 interface RootLayoutProps {
   children?: ReactNode;
@@ -15,23 +15,30 @@ interface RootLayoutProps {
   drawer?: boolean;
   drawerWidth?: number;
   drawerItems?: DrawerItem[];
+  drawerTypography?: DrawerItemTypography;
   currentPath?: string;
   onNavigate?: (path: string) => void;
 }
 
-// componente interno que já tem acesso ao context
 function RootLayoutInner({
   children,
   topBar,
   topBarProps,
   drawer,
-  drawerWidth,
+  drawerWidth: initialDrawerWidth = 240,
   drawerItems,
+  drawerTypography,
   hasExternalTheme,
   currentPath,
   onNavigate,
 }: RootLayoutProps & { hasExternalTheme: boolean }) {
-  const { theme, drawerCollapsed, setDrawerCollapsed } = useRootLayoutContext();
+  const {
+    theme,
+    drawerCollapsed,
+    setDrawerCollapsed,
+    drawerWidth,        // ← largura atual do context
+    setDrawerWidth,     // ← atualizada pelo LeftDrawer
+  } = useRootLayoutContext();
 
   return (
     <ThemeProvider theme={theme}>
@@ -39,7 +46,7 @@ function RootLayoutInner({
       {topBar && (
         <TopAppBar
           {...topBarProps}
-          drawerWidth={drawerWidth}
+          drawerWidth={drawerWidth}   // ← usa o do context, acompanha resize
           hasDrawer={drawer}
           showThemeToggle={!hasExternalTheme}
         />
@@ -49,10 +56,12 @@ function RootLayoutInner({
           <LeftDrawer
             collapsed={drawerCollapsed}
             setCollapsed={setDrawerCollapsed}
-            width={drawerWidth}
+            width={initialDrawerWidth}
             items={drawerItems}
             currentPath={currentPath}
             onNavigate={onNavigate}
+            typography={drawerTypography}
+            onWidthChange={setDrawerWidth}  // ← callback para notificar o context
           />
         )}
         <Box
@@ -76,19 +85,21 @@ export default function RootLayout({
   drawer = true,
   drawerWidth = 240,
   drawerItems,
+  drawerTypography,
   topBarProps,
   currentPath,
   onNavigate,
   children,
 }: RootLayoutProps) {
   return (
-    <RootLayoutProvider externalTheme={theme}>
+    <RootLayoutProvider externalTheme={theme} initialDrawerWidth={drawerWidth}>
       <RootLayoutInner
         topBar={topBar}
         topBarProps={topBarProps}
         drawer={drawer}
         drawerWidth={drawerWidth}
         drawerItems={drawerItems}
+        drawerTypography={drawerTypography}
         hasExternalTheme={!!theme}
         currentPath={currentPath}
         onNavigate={onNavigate}

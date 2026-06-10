@@ -7,6 +7,8 @@ interface RootLayoutContextValue {
   toggleMode: () => void;
   drawerCollapsed: boolean;
   setDrawerCollapsed: (value: boolean) => void;
+  drawerWidth: number,
+  setDrawerWidth: (value: number) => void;
   theme: Theme;
 }
 
@@ -15,12 +17,16 @@ const RootLayoutContext = createContext<RootLayoutContextValue | null>(null);
 export function RootLayoutProvider({
   children,
   externalTheme,
+  initialDrawerWidth = 240,
 }: {
   children: ReactNode;
   externalTheme?: Theme;
+  initialDrawerWidth?: number;  
 }) {
   const [mode, setMode] = useState<PaletteMode>('light');
   const [drawerCollapsed, setDrawerCollapsed] = useState(false);
+  const [drawerWidth, setDrawerWidth] = useState(initialDrawerWidth);
+
 
   // sem closure freeze: sempre lê o prev mais recente
   const toggleMode = () => setMode(prev => prev === 'light' ? 'dark' : 'light');
@@ -32,11 +38,11 @@ export function RootLayoutProvider({
 
   return (
     <RootLayoutContext.Provider value={{
-      mode,
-      toggleMode,
-      drawerCollapsed,
-      setDrawerCollapsed,
+      mode, toggleMode,
+      drawerCollapsed, setDrawerCollapsed,
+      drawerWidth, setDrawerWidth ,
       theme: externalTheme ?? internalTheme,
+
     }}>
       {children}
     </RootLayoutContext.Provider>

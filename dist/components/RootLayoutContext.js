@@ -3,17 +3,17 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import { createContext, useContext, useState, useMemo } from 'react';
 import { createTheme } from '@mui/material';
 const RootLayoutContext = createContext(null);
-export function RootLayoutProvider({ children, externalTheme, }) {
+export function RootLayoutProvider({ children, externalTheme, initialDrawerWidth = 240, }) {
     const [mode, setMode] = useState('light');
     const [drawerCollapsed, setDrawerCollapsed] = useState(false);
+    const [drawerWidth, setDrawerWidth] = useState(initialDrawerWidth);
     // sem closure freeze: sempre lê o prev mais recente
     const toggleMode = () => setMode(prev => prev === 'light' ? 'dark' : 'light');
     const internalTheme = useMemo(() => createTheme({ palette: { mode } }), [mode]);
     return (_jsx(RootLayoutContext.Provider, { value: {
-            mode,
-            toggleMode,
-            drawerCollapsed,
-            setDrawerCollapsed,
+            mode, toggleMode,
+            drawerCollapsed, setDrawerCollapsed,
+            drawerWidth, setDrawerWidth,
             theme: externalTheme ?? internalTheme,
         }, children: children }));
 }

@@ -5,11 +5,14 @@ interface RootLayoutContextValue {
     toggleMode: () => void;
     drawerCollapsed: boolean;
     setDrawerCollapsed: (value: boolean) => void;
+    drawerWidth: number;
+    setDrawerWidth: (value: number) => void;
     theme: Theme;
 }
-export declare function RootLayoutProvider({ children, externalTheme, }: {
+export declare function RootLayoutProvider({ children, externalTheme, initialDrawerWidth, }: {
     children: ReactNode;
     externalTheme?: Theme;
+    initialDrawerWidth?: number;
 }): import("react").JSX.Element;
 export declare function useRootLayoutContext(): RootLayoutContextValue;
 export {};
