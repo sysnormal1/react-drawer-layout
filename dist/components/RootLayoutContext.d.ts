@@ -8,11 +8,16 @@ interface RootLayoutContextValue {
     drawerWidth: number;
     setDrawerWidth: (value: number) => void;
     theme: Theme;
+    topBarTitle: ReactNode;
+    setTopBarTitle: (value: ReactNode) => void;
+    topBarChildren: ReactNode;
+    setTopBarChildren: (value: ReactNode) => void;
 }
-export declare function RootLayoutProvider({ children, externalTheme, initialDrawerWidth, }: {
+export declare function RootLayoutProvider({ children, externalTheme, initialDrawerWidth, defaultTopBarTitle, }: {
     children: ReactNode;
     externalTheme?: Theme;
     initialDrawerWidth?: number;
+    defaultTopBarTitle?: ReactNode;
 }): import("react").JSX.Element;
 export declare function useRootLayoutContext(): RootLayoutContextValue;
 export {};

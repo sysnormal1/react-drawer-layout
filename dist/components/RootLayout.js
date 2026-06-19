@@ -4,16 +4,16 @@ import { Box, CssBaseline, ThemeProvider } from '@mui/material';
 import { RootLayoutProvider, useRootLayoutContext } from './RootLayoutContext.js';
 import TopAppBar from './TopAppBar.js';
 import LeftDrawer from './LeftDrawer.js';
-function RootLayoutInner({ children, topBar, topBarProps, drawer, drawerWidth: initialDrawerWidth = 240, drawerItems, drawerTypography, hasExternalTheme, currentPath, onNavigate, }) {
+function RootLayoutInner({ children, topBar, topBarProps, drawer, drawerWidth: initialDrawerWidth = 240, drawerItems, drawerTypography, hasExternalTheme, currentPath, onNavigate, translater, }) {
     const { theme, drawerCollapsed, setDrawerCollapsed, drawerWidth, // ← largura atual do context
     setDrawerWidth, // ← atualizada pelo LeftDrawer
      } = useRootLayoutContext();
-    return (_jsxs(ThemeProvider, { theme: theme, children: [_jsx(CssBaseline, { enableColorScheme: true }), topBar && (_jsx(TopAppBar, { ...topBarProps, drawerWidth: drawerWidth, hasDrawer: drawer, showThemeToggle: !hasExternalTheme })), _jsxs(Box, { sx: { display: 'flex' }, children: [drawer && (_jsx(LeftDrawer, { collapsed: drawerCollapsed, setCollapsed: setDrawerCollapsed, width: initialDrawerWidth, items: drawerItems, currentPath: currentPath, onNavigate: onNavigate, typography: drawerTypography, onWidthChange: setDrawerWidth })), _jsx(Box, { component: "main", sx: {
+    return (_jsxs(ThemeProvider, { theme: theme, children: [_jsx(CssBaseline, { enableColorScheme: true }), topBar && (_jsx(TopAppBar, { ...topBarProps, drawerWidth: drawerWidth, hasDrawer: drawer, showThemeToggle: !hasExternalTheme })), _jsxs(Box, { sx: { display: 'flex' }, children: [drawer && (_jsx(LeftDrawer, { collapsed: drawerCollapsed, setCollapsed: setDrawerCollapsed, width: initialDrawerWidth, items: drawerItems, currentPath: currentPath, onNavigate: onNavigate, typography: drawerTypography, onWidthChange: setDrawerWidth, translater: translater })), _jsx(Box, { component: "main", sx: {
                             flexGrow: 1,
                             p: 3,
                             mt: topBar ? 8 : 0,
                         }, children: children })] })] }));
 }
-export default function RootLayout({ theme, topBar = true, drawer = true, drawerWidth = 240, drawerItems, drawerTypography, topBarProps, currentPath, onNavigate, children, }) {
-    return (_jsx(RootLayoutProvider, { externalTheme: theme, initialDrawerWidth: drawerWidth, children: _jsx(RootLayoutInner, { topBar: topBar, topBarProps: topBarProps, drawer: drawer, drawerWidth: drawerWidth, drawerItems: drawerItems, drawerTypography: drawerTypography, hasExternalTheme: !!theme, currentPath: currentPath, onNavigate: onNavigate, children: children }) }));
+export default function RootLayout({ theme, topBar = true, drawer = true, drawerWidth = 240, drawerItems, drawerTypography, topBarProps, currentPath, onNavigate, translater, children, }) {
+    return (_jsx(RootLayoutProvider, { externalTheme: theme, initialDrawerWidth: drawerWidth, defaultTopBarTitle: topBarProps?.defaultTitle, children: _jsx(RootLayoutInner, { topBar: topBar, topBarProps: topBarProps, drawer: drawer, drawerWidth: drawerWidth, drawerItems: drawerItems, drawerTypography: drawerTypography, hasExternalTheme: !!theme, currentPath: currentPath, onNavigate: onNavigate, translater: translater, children: children }) }));
 }

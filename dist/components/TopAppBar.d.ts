@@ -1,10 +1,10 @@
 import { ReactNode } from 'react';
 export interface TopAppBarProps {
-    title?: ReactNode;
+    defaultTitle?: ReactNode;
     drawerWidth?: number;
     hasDrawer?: boolean;
-    actions?: ReactNode;
     showThemeToggle?: boolean;
+    actions?: ReactNode;
 }
-export default function TopAppBar({ title, drawerWidth, hasDrawer, actions, showThemeToggle, }: TopAppBarProps): import("react").JSX.Element;
+export default function TopAppBar({ defaultTitle, drawerWidth, hasDrawer, showThemeToggle, actions }: TopAppBarProps): import("react").JSX.Element;
 //# sourceMappingURL=TopAppBar.d.ts.map

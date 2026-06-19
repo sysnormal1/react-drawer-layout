@@ -18,6 +18,7 @@ interface RootLayoutProps {
   drawerTypography?: DrawerItemTypography;
   currentPath?: string;
   onNavigate?: (path: string) => void;
+  translater?: (text: string) => string;
 }
 
 function RootLayoutInner({
@@ -31,6 +32,7 @@ function RootLayoutInner({
   hasExternalTheme,
   currentPath,
   onNavigate,
+  translater,
 }: RootLayoutProps & { hasExternalTheme: boolean }) {
   const {
     theme,
@@ -62,6 +64,7 @@ function RootLayoutInner({
             onNavigate={onNavigate}
             typography={drawerTypography}
             onWidthChange={setDrawerWidth}  // ← callback para notificar o context
+            translater={translater}
           />
         )}
         <Box
@@ -89,10 +92,15 @@ export default function RootLayout({
   topBarProps,
   currentPath,
   onNavigate,
+  translater,
   children,
 }: RootLayoutProps) {
   return (
-    <RootLayoutProvider externalTheme={theme} initialDrawerWidth={drawerWidth}>
+    <RootLayoutProvider
+      externalTheme={theme}
+      initialDrawerWidth={drawerWidth}
+      defaultTopBarTitle={topBarProps?.defaultTitle}
+    >
       <RootLayoutInner
         topBar={topBar}
         topBarProps={topBarProps}
@@ -103,6 +111,7 @@ export default function RootLayout({
         hasExternalTheme={!!theme}
         currentPath={currentPath}
         onNavigate={onNavigate}
+        translater={translater}
       >
         {children}
       </RootLayoutInner>

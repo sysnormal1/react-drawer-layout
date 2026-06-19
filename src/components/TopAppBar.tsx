@@ -26,24 +26,28 @@ const AppBar: any = styled(MuiAppBar, {
 }));
 
 export interface TopAppBarProps {
-  title?: ReactNode;
+  // título padrão usado quando nenhuma tela define um via useTopBar
+  defaultTitle?: ReactNode;
   drawerWidth?: number;
   hasDrawer?: boolean;
-  // slot para o cliente injetar botões extras (perfil, notificações, etc.)
-  actions?: ReactNode;
-  // se o dev passar tema externo, o botão de toggle some
   showThemeToggle?: boolean;
+  actions?: ReactNode; // ← slot fixo, ex: UserMenu
 }
 
 export default function TopAppBar({
-  title,
+  defaultTitle,
   drawerWidth = 240,
   hasDrawer = true,
-  actions,
   showThemeToggle = true,
+  actions
 }: TopAppBarProps) {
-  const { mode, toggleMode, drawerCollapsed, setDrawerCollapsed } =
-    useRootLayoutContext();
+  const {
+    mode, toggleMode,
+    drawerCollapsed, setDrawerCollapsed,
+    topBarTitle, topBarChildren,
+  } = useRootLayoutContext();
+
+  console.debug("actons",actions);
 
   return (
     <AppBar
@@ -69,11 +73,11 @@ export default function TopAppBar({
         )}
 
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          {title}
+          {topBarTitle ?? defaultTitle}
         </Typography>
 
-        {/* slot livre para o cliente injetar o que quiser */}
-        {actions}
+        {/* injetado dinamicamente pelas telas via useTopBar */}
+        {topBarChildren}
 
         {showThemeToggle && (
           <Tooltip title={`Mudar para tema ${mode === 'light' ? 'escuro' : 'claro'}`}>
@@ -82,6 +86,7 @@ export default function TopAppBar({
             </IconButton>
           </Tooltip>
         )}
+        {actions}
       </Toolbar>
     </AppBar>
   );

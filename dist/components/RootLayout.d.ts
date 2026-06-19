@@ -13,7 +13,8 @@ interface RootLayoutProps {
     drawerTypography?: DrawerItemTypography;
     currentPath?: string;
     onNavigate?: (path: string) => void;
+    translater?: (text: string) => string;
 }
-export default function RootLayout({ theme, topBar, drawer, drawerWidth, drawerItems, drawerTypography, topBarProps, currentPath, onNavigate, children, }: RootLayoutProps): import("react").JSX.Element;
+export default function RootLayout({ theme, topBar, drawer, drawerWidth, drawerItems, drawerTypography, topBarProps, currentPath, onNavigate, translater, children, }: RootLayoutProps): import("react").JSX.Element;
 export {};
 //# sourceMappingURL=RootLayout.d.ts.map
