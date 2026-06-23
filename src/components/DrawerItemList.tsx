@@ -46,6 +46,7 @@ function DrawerItemRow({
   depth?: number;
   typography?: DrawerItemTypography;
 }) {
+  console.debug("mounting DrawerItemRow", item);
   const [open, setOpen] = useState(false);
   const hasChildren = !!item.children?.length;
   const isActive = !!item.path && currentPath?.startsWith(item.path);
@@ -53,11 +54,11 @@ function DrawerItemRow({
   const handleClick = useCallback(() => {
     if (hasChildren) {
       setOpen(prev => !prev);
-    } else if (item.path) {
+    } 
+    if (item.path) {
       onNavigate?.(item.path);
-    } else {
-      item.onClick?.();
-    }
+    } 
+    item.onClick?.();
   }, [hasChildren, item, onNavigate]);
 
   const button = (

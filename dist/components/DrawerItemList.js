@@ -14,6 +14,7 @@ function matchesSearch(item, query) {
     return false;
 }
 function DrawerItemRow({ item, collapsed, currentPath, onNavigate, searchQuery, depth = 0, typography, }) {
+    console.debug("mounting DrawerItemRow", item);
     const [open, setOpen] = useState(false);
     const hasChildren = !!item.children?.length;
     const isActive = !!item.path && currentPath?.startsWith(item.path);
@@ -21,12 +22,10 @@ function DrawerItemRow({ item, collapsed, currentPath, onNavigate, searchQuery, 
         if (hasChildren) {
             setOpen(prev => !prev);
         }
-        else if (item.path) {
+        if (item.path) {
             onNavigate?.(item.path);
         }
-        else {
-            item.onClick?.();
-        }
+        item.onClick?.();
     }, [hasChildren, item, onNavigate]);
     const button = (_jsxs(ListItemButton, { onClick: handleClick, selected: isActive, sx: { pl: 2 + depth * 2 }, children: [item.icon && (_jsx(ListItemIcon, { sx: {
                     minWidth: collapsed && depth === 0 ? 'unset' : 40, // ← era 36, aumentar para 40
