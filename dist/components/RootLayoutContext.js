@@ -8,6 +8,19 @@ function getSystemTheme() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 const STORAGE_KEY = 'sysnormalTheme'; // chave comum de sysnormal
+/**
+ * Mesmo corte do `theme.breakpoints.down('sm')` padrão do MUI (600px).
+ *
+ * Em tela pequena o drawer é temporário — ele cobre a página em vez de dividir a
+ * largura com ela —, e por isso precisa NASCER fechado. Começar aberto fazia o
+ * menu cobrir a tela inteira a cada carga no celular.
+ */
+export const SMALL_SCREEN_QUERY = '(max-width:599.95px)';
+function isSmallScreenNow() {
+    if (typeof window === 'undefined' || !window.matchMedia)
+        return false;
+    return window.matchMedia(SMALL_SCREEN_QUERY).matches;
+}
 function getInitialMode() {
     if (typeof window === 'undefined')
         return 'light';
@@ -17,7 +30,7 @@ function getInitialMode() {
 const RootLayoutContext = createContext(null);
 export function RootLayoutProvider({ children, externalTheme, initialDrawerWidth = 240, defaultTopBarTitle, }) {
     const [mode, setMode] = useState(getInitialMode);
-    const [drawerCollapsed, setDrawerCollapsed] = useState(false);
+    const [drawerCollapsed, setDrawerCollapsed] = useState(isSmallScreenNow);
     const [drawerWidth, setDrawerWidth] = useState(initialDrawerWidth);
     const [topBarTitle, setTopBarTitle] = useState(defaultTopBarTitle);
     const [topBarChildren, setTopBarChildren] = useState(null);

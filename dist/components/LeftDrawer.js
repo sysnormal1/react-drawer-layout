@@ -185,7 +185,17 @@ const LeftDrawer = forwardRef(({ collapsed = false, width: initialWidth = 240, i
     }, [width]);
     const text = _.capitalize(translater ? translater(searchText) : searchText);
     const contentHeader = (_jsxs(DrawerHeader, { children: [_jsxs(Search, { children: [_jsx(SearchIconWrapper, { children: _jsx(SearchOutlined, {}) }), _jsx(SearchInputBase, { placeholder: text, value: searchQuery, onChange: e => setSearchQuery(e.target.value), inputProps: { 'aria-label': text } })] }), _jsx(IconButton, { onClick: () => setCollapsed?.(true), children: _jsx(ChevronLeft, {}) })] }));
-    const contentList = (_jsx(Box, { ref: contentRef, sx: { overflowX: 'hidden' }, children: _jsx(DrawerItemList, { items: items, collapsed: collapsed, currentPath: currentPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/'), onNavigate: onNavigate ?? (path => { window.location.href = path; }), searchQuery: searchQuery, typography: typography }) }));
+    /* No drawer temporário, escolher um destino fecha o menu: ele está cobrindo a
+      página que acabou de ser aberta. No desktop o menu divide a tela e fica. */
+    const navigate = useCallback((path) => {
+        if (onNavigate)
+            onNavigate(path);
+        else
+            window.location.href = path;
+        if (isSmallScreen)
+            setCollapsed?.(true);
+    }, [onNavigate, isSmallScreen, setCollapsed]);
+    const contentList = (_jsx(Box, { ref: contentRef, sx: { overflowX: 'hidden' }, children: _jsx(DrawerItemList, { items: items, collapsed: collapsed, currentPath: currentPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/'), onNavigate: navigate, searchQuery: searchQuery, typography: typography }) }));
     // alça de resize na borda direita
     const resizeHandle = resizable && !collapsed && !isSmallScreen ? (_jsx(Box, { onMouseDown: handleDragStart, sx: {
             position: 'absolute',
@@ -201,7 +211,9 @@ const LeftDrawer = forwardRef(({ collapsed = false, width: initialWidth = 240, i
             },
         } })) : null;
     const drawerContent = (_jsxs(_Fragment, { children: [contentHeader, _jsx(Divider, {}), contentList, resizeHandle] }));
-    return isSmallScreen ? (_jsx(MuiDrawer, { ref: ref, variant: "temporary", open: !collapsed, ...drawerProps, children: drawerContent })) : (_jsx(StyledDrawer, { ref: ref, variant: "permanent", open: !collapsed, width: width, ...drawerProps, children: drawerContent }));
+    return isSmallScreen ? (_jsx(MuiDrawer, { ref: ref, variant: "temporary", open: !collapsed, 
+        // sem isto o fundo escurecido e o Esc não fechavam o menu
+        onClose: () => setCollapsed?.(true), ModalProps: { keepMounted: true }, ...drawerProps, children: drawerContent })) : (_jsx(StyledDrawer, { ref: ref, variant: "permanent", open: !collapsed, width: width, ...drawerProps, children: drawerContent }));
 });
 LeftDrawer.displayName = "LeftDrawer";
 export default LeftDrawer;

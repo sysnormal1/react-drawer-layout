@@ -281,13 +281,21 @@ const LeftDrawer = forwardRef<HTMLDivElement, LeftDrawerProps>(
     );
 
 
-     const contentList = (
+     /* No drawer temporário, escolher um destino fecha o menu: ele está cobrindo a
+       página que acabou de ser aberta. No desktop o menu divide a tela e fica. */
+    const navigate = useCallback((path: string) => {
+      if (onNavigate) onNavigate(path);
+      else window.location.href = path;
+      if (isSmallScreen) setCollapsed?.(true);
+    }, [onNavigate, isSmallScreen, setCollapsed]);
+
+    const contentList = (
       <Box ref={contentRef} sx={{ overflowX: 'hidden' }}>
         <DrawerItemList
           items={items}
           collapsed={collapsed}
           currentPath={currentPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/')}
-          onNavigate={onNavigate ?? (path => { window.location.href = path; })}
+          onNavigate={navigate}
           searchQuery={searchQuery}
           typography={typography}
         />
@@ -328,6 +336,9 @@ const LeftDrawer = forwardRef<HTMLDivElement, LeftDrawerProps>(
         ref={ref}
         variant="temporary"
         open={!collapsed}
+        // sem isto o fundo escurecido e o Esc não fechavam o menu
+        onClose={() => setCollapsed?.(true)}
+        ModalProps={{ keepMounted: true }}
         {...drawerProps}
       >
         {drawerContent}

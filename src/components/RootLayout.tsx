@@ -1,6 +1,6 @@
 // src/components/RootLayout.tsx
-import { Box, CssBaseline, ThemeProvider } from '@mui/material';
-import { ReactNode } from 'react';
+import { Box, CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material';
+import { ReactNode, useEffect } from 'react';
 import { Theme } from '@mui/material';
 import { RootLayoutProvider, useRootLayoutContext } from './RootLayoutContext.js';
 import TopAppBar, { TopAppBarProps } from './TopAppBar.js';
@@ -42,6 +42,14 @@ function RootLayoutInner({
     setDrawerWidth,     // ← atualizada pelo LeftDrawer
   } = useRootLayoutContext();
 
+  /* Ao ENTRAR em tela pequena o menu fecha — girar o celular ou estreitar a
+     janela não pode deixar um drawer temporário cobrindo a página. Ao sair, o
+     estado fica como está: no desktop quem decide é a pessoa. */
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'), { noSsr: true });
+  useEffect(() => {
+    if (isSmallScreen) setDrawerCollapsed(true);
+  }, [isSmallScreen, setDrawerCollapsed]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
@@ -50,6 +58,7 @@ function RootLayoutInner({
           {...topBarProps}
           drawerWidth={drawerWidth}   // ← usa o do context, acompanha resize
           hasDrawer={drawer}
+          overlayDrawer={isSmallScreen}
           showThemeToggle={!hasExternalTheme}
         />
       )}

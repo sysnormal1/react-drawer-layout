@@ -8,9 +8,12 @@ import { ReactNode } from 'react';
 import { useRootLayoutContext } from './RootLayoutContext.js';
 
 const AppBar: any = styled(MuiAppBar, {
-  shouldForwardProp: prop => prop !== 'drawerOpen' && prop !== 'drawerWidth',
-})(({ theme, drawerOpen, drawerWidth }: any) => ({
-  zIndex: theme.zIndex.drawer + 1,
+  shouldForwardProp: prop => prop !== 'drawerOpen' && prop !== 'drawerWidth' && prop !== 'overlayDrawer',
+})(({ theme, drawerOpen, drawerWidth, overlayDrawer }: any) => ({
+  /* No desktop a barra passa por cima do mini-drawer; com drawer temporário é o
+     contrário — o menu aberto cobre a barra, senão ela esconde a busca e o botão
+     de fechar que ficam no topo dele. */
+  zIndex: overlayDrawer ? theme.zIndex.appBar : theme.zIndex.drawer + 1,
   transition: theme.transitions.create(['width', 'margin'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -32,6 +35,12 @@ export interface TopAppBarProps {
   hasDrawer?: boolean;
   showThemeToggle?: boolean;
   actions?: ReactNode; // ← slot fixo, ex: UserMenu
+  /**
+   * `true` quando o drawer é temporário (tela pequena): ele cobre a página em vez
+   * de ocupar uma coluna, então a barra não se desloca e o botão de menu fica
+   * sempre visível.
+   */
+  overlayDrawer?: boolean;
 }
 
 export default function TopAppBar({
@@ -39,7 +48,8 @@ export default function TopAppBar({
   drawerWidth = 240,
   hasDrawer = true,
   showThemeToggle = true,
-  actions
+  actions,
+  overlayDrawer = false
 }: TopAppBarProps) {
   const {
     mode, toggleMode,
@@ -47,13 +57,12 @@ export default function TopAppBar({
     topBarTitle, topBarChildren,
   } = useRootLayoutContext();
 
-  console.debug("actons",actions);
-
   return (
     <AppBar
       position="fixed"
-      drawerOpen={hasDrawer && !drawerCollapsed}
+      drawerOpen={hasDrawer && !drawerCollapsed && !overlayDrawer}
       drawerWidth={drawerWidth}
+      overlayDrawer={overlayDrawer}
     >
       <Toolbar>
         {hasDrawer && (
@@ -63,8 +72,8 @@ export default function TopAppBar({
               edge="start"
               onClick={() => setDrawerCollapsed(!drawerCollapsed)}
               sx={{
-                marginRight: 5,
-                ...(!drawerCollapsed && { display: 'none' }),
+                marginRight: overlayDrawer ? 1 : 5,
+                ...(!drawerCollapsed && !overlayDrawer && { display: 'none' }),
               }}
             >
               <MenuIcon />
