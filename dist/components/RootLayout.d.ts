@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Theme } from '@mui/material';
 import { TopAppBarProps } from './TopAppBar.js';
-import { DrawerItem, DrawerItemTypography } from './DrawerItem.js';
+import { DrawerAppearance, DrawerItem, DrawerItemTypography } from './DrawerItem.js';
 interface RootLayoutProps {
     children?: ReactNode;
     theme?: Theme;
@@ -11,10 +11,12 @@ interface RootLayoutProps {
     drawerWidth?: number;
     drawerItems?: DrawerItem[];
     drawerTypography?: DrawerItemTypography;
+    /** Aparência dos itens do menu lateral (ver `DrawerAppearance`). */
+    drawerAppearance?: DrawerAppearance;
     currentPath?: string;
     onNavigate?: (path: string) => void;
     translater?: (text: string) => string;
 }
-export default function RootLayout({ theme, topBar, drawer, drawerWidth, drawerItems, drawerTypography, topBarProps, currentPath, onNavigate, translater, children, }: RootLayoutProps): import("react").JSX.Element;
+export default function RootLayout({ theme, topBar, drawer, drawerWidth, drawerItems, drawerTypography, drawerAppearance, topBarProps, currentPath, onNavigate, translater, children, }: RootLayoutProps): import("react").JSX.Element;
 export {};
 //# sourceMappingURL=RootLayout.d.ts.map

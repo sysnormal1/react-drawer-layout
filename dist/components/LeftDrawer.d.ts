@@ -1,6 +1,6 @@
 import { DrawerProps as MuiDrawerProps } from "@mui/material";
 import React from "react";
-import { DrawerItem, DrawerItemTypography } from './DrawerItem.js';
+import { DrawerAppearance, DrawerItem, DrawerItemTypography } from './DrawerItem.js';
 export interface LeftDrawerProps extends Omit<MuiDrawerProps, 'open'> {
     collapsed?: boolean;
     width?: number | string;
@@ -11,6 +11,8 @@ export interface LeftDrawerProps extends Omit<MuiDrawerProps, 'open'> {
     currentPath?: string;
     onNavigate?: (path: string) => void;
     typography?: DrawerItemTypography;
+    /** Aparência dos itens: comum, aninhado e selecionado. */
+    appearance?: DrawerAppearance;
     resizable?: boolean;
     onWidthChange?: (width: number) => void;
 }

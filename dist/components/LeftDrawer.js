@@ -95,7 +95,7 @@ const SearchInputBase = styled(InputBase)(({ theme }) => ({
 }));
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 600;
-const LeftDrawer = forwardRef(({ collapsed = false, width: initialWidth = 240, items = [], translater, searchText = 'search', setCollapsed, currentPath, onNavigate, typography, resizable = true, onWidthChange, ...drawerProps }, ref) => {
+const LeftDrawer = forwardRef(({ collapsed = false, width: initialWidth = 240, items = [], translater, searchText = 'search', setCollapsed, currentPath, onNavigate, typography, appearance, resizable = true, onWidthChange, ...drawerProps }, ref) => {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
     const [searchQuery, setSearchQuery] = useState('');
@@ -161,7 +161,7 @@ const LeftDrawer = forwardRef(({ collapsed = false, width: initialWidth = 240, i
             clearTimeout(debounceId);
             mutationObserver.disconnect();
         };
-    }, [collapsed, items]);
+    }, [collapsed, items, appearance, typography]);
     // drag para redimensionar
     const handleDragStart = useCallback((e) => {
         e.preventDefault();
@@ -195,7 +195,7 @@ const LeftDrawer = forwardRef(({ collapsed = false, width: initialWidth = 240, i
         if (isSmallScreen)
             setCollapsed?.(true);
     }, [onNavigate, isSmallScreen, setCollapsed]);
-    const contentList = (_jsx(Box, { ref: contentRef, sx: { overflowX: 'hidden' }, children: _jsx(DrawerItemList, { items: items, collapsed: collapsed, currentPath: currentPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/'), onNavigate: navigate, searchQuery: searchQuery, typography: typography }) }));
+    const contentList = (_jsx(Box, { ref: contentRef, sx: { overflowX: 'hidden' }, children: _jsx(DrawerItemList, { items: items, collapsed: collapsed, currentPath: currentPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/'), onNavigate: navigate, searchQuery: searchQuery, typography: typography, appearance: appearance }) }));
     // alça de resize na borda direita
     const resizeHandle = resizable && !collapsed && !isSmallScreen ? (_jsx(Box, { onMouseDown: handleDragStart, sx: {
             position: 'absolute',

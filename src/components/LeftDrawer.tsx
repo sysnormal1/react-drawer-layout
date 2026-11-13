@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import _ from "lodash";
 import React, { ReactNode, forwardRef, useCallback, useEffect, useRef, useState } from "react";
-import { DrawerItem, DrawerItemTypography } from './DrawerItem.js';
+import { DrawerAppearance, DrawerItem, DrawerItemTypography } from './DrawerItem.js';
 import { DrawerItemList } from "./DrawerItemList.js";
 
 
@@ -128,6 +128,8 @@ export interface LeftDrawerProps extends Omit<MuiDrawerProps, 'open'> {
   currentPath?: string;
   onNavigate?: (path: string) => void;
   typography?: DrawerItemTypography;
+  /** Aparência dos itens: comum, aninhado e selecionado. */
+  appearance?: DrawerAppearance;
   resizable?: boolean;
   onWidthChange?: (width: number) => void;
 
@@ -148,6 +150,7 @@ const LeftDrawer = forwardRef<HTMLDivElement, LeftDrawerProps>(
     currentPath,
     onNavigate,
     typography,
+    appearance,
     resizable = true,
     onWidthChange,
     ...drawerProps
@@ -231,7 +234,7 @@ const LeftDrawer = forwardRef<HTMLDivElement, LeftDrawerProps>(
         mutationObserver.disconnect();
       };
 
-    }, [collapsed, items]);
+    }, [collapsed, items, appearance, typography]);
 
      // drag para redimensionar
     const handleDragStart = useCallback((e: React.MouseEvent) => {
@@ -298,6 +301,7 @@ const LeftDrawer = forwardRef<HTMLDivElement, LeftDrawerProps>(
           onNavigate={navigate}
           searchQuery={searchQuery}
           typography={typography}
+          appearance={appearance}
         />
       </Box>
     );

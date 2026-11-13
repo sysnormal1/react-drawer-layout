@@ -5,7 +5,7 @@ import { Theme } from '@mui/material';
 import { RootLayoutProvider, useRootLayoutContext } from './RootLayoutContext.js';
 import TopAppBar, { TopAppBarProps } from './TopAppBar.js';
 import LeftDrawer from './LeftDrawer.js';
-import { DrawerItem, DrawerItemTypography } from './DrawerItem.js';
+import { DrawerAppearance, DrawerItem, DrawerItemTypography } from './DrawerItem.js';
 
 interface RootLayoutProps {
   children?: ReactNode;
@@ -16,6 +16,8 @@ interface RootLayoutProps {
   drawerWidth?: number;
   drawerItems?: DrawerItem[];
   drawerTypography?: DrawerItemTypography;
+  /** Aparência dos itens do menu lateral (ver `DrawerAppearance`). */
+  drawerAppearance?: DrawerAppearance;
   currentPath?: string;
   onNavigate?: (path: string) => void;
   translater?: (text: string) => string;
@@ -29,6 +31,7 @@ function RootLayoutInner({
   drawerWidth: initialDrawerWidth = 240,
   drawerItems,
   drawerTypography,
+  drawerAppearance,
   hasExternalTheme,
   currentPath,
   onNavigate,
@@ -72,6 +75,7 @@ function RootLayoutInner({
             currentPath={currentPath}
             onNavigate={onNavigate}
             typography={drawerTypography}
+            appearance={drawerAppearance}
             onWidthChange={setDrawerWidth}  // ← callback para notificar o context
             translater={translater}
           />
@@ -98,6 +102,7 @@ export default function RootLayout({
   drawerWidth = 240,
   drawerItems,
   drawerTypography,
+  drawerAppearance,
   topBarProps,
   currentPath,
   onNavigate,
@@ -117,6 +122,7 @@ export default function RootLayout({
         drawerWidth={drawerWidth}
         drawerItems={drawerItems}
         drawerTypography={drawerTypography}
+        drawerAppearance={drawerAppearance}
         hasExternalTheme={!!theme}
         currentPath={currentPath}
         onNavigate={onNavigate}
